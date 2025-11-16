@@ -107,6 +107,73 @@ When you contribute, ask:
 - Would I deploy this to production?
 - Does the documentation explain *why*, not just *what*?
 
+### Git Commit Convention
+
+We use **semantic commits** for clear, searchable history:
+
+```
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
+```
+
+**Types:**
+- `feat`: New feature
+- `fix`: Bug fix
+- `docs`: Documentation only
+- `style`: Formatting, missing semicolons, etc (no code change)
+- `refactor`: Code change that neither fixes a bug nor adds a feature
+- `perf`: Performance improvement
+- `test`: Adding or updating tests
+- `chore`: Updating build tasks, package manager configs, etc
+- `ci`: Changes to CI configuration files and scripts
+- `build`: Changes that affect the build system
+
+**Examples:**
+```bash
+feat(yolo): add YOLOv8 support with GPU acceleration
+
+- Implement YOLODetector class with BaseDetector interface
+- Add confidence and IoU threshold parameters
+- Support both CPU and CUDA devices
+- Include comprehensive error handling
+
+Closes #42
+
+fix(notebook): initialize ncars variable before loop
+
+The original code had a NameError because ncars was incremented
+before initialization. Added ncars = 0 before the for loop.
+
+docs(claude): add semantic commit convention to philosophy
+
+refactor(detectors): extract common validation to base class
+
+test(haar): add unit tests for edge cases
+
+perf(image): optimize resize operation with cv2.INTER_AREA
+```
+
+**Emoji Prefixes (Optional but Encouraged):**
+- 🚀 `:rocket:` - Major features or releases
+- 🐛 `:bug:` - Bug fixes
+- 📚 `:books:` - Documentation
+- ✨ `:sparkles:` - New features
+- ♻️ `:recycle:` - Refactoring
+- 🔒 `:lock:` - Security improvements
+- ⚡ `:zap:` - Performance improvements
+- 🧪 `:test_tube:` - Tests
+- 🎨 `:art:` - UI/UX improvements
+
+**Commit Message Guidelines:**
+1. **Subject line**: Imperative mood ("add" not "added"), max 50 chars
+2. **Body**: Explain *what* and *why*, not *how* (code shows how)
+3. **Footer**: Reference issues, breaking changes
+4. **Atomic commits**: One logical change per commit
+5. **Tested**: Every commit should leave the codebase in a working state
+
 ## The Future
 
 This architecture is extensible:
