@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Detection - Computer Vision Evolution</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 3em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .subtitle {
+            font-size: 1.3em;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .timeline {
+            font-size: 1.1em;
+            opacity: 0.8;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            margin-bottom: 30px;
+        }
+
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 60px 40px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: #f8f9ff;
+        }
+
+        .upload-area:hover, .upload-area.dragover {
+            border-color: #764ba2;
+            background: #f0f1ff;
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .upload-text {
+            font-size: 1.3em;
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .upload-subtext {
+            color: #888;
+            font-size: 0.95em;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .detector-choice {
+            margin: 30px 0;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .detector-btn {
+            padding: 15px 40px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 30px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .detector-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .detector-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .process-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.2em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .process-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .process-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .results {
+            display: none;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .result-item {
+            background: #f8f9ff;
+            border-radius: 15px;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+        }
+
+        .result-item h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+
+        .result-item img {
+            width: 100%;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .stat {
+            text-align: center;
+            padding: 10px;
+            background: white;
+            border-radius: 10px;
+        }
+
+        .stat-value {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 0.85em;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        .comparison-image {
+            width: 100%;
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+
+        .error {
+            background: #fee;
+            border: 2px solid #fcc;
+            color: #c33;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .detector-choice {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚗 Vehicle Detection Evolution</h1>
+            <p class="subtitle">Compare Classical vs Modern Computer Vision</p>
+            <p class="timeline">Haar Cascades (2001) ⚔️ YOLOv8 (2023)</p>
+        </header>
+
+        <div class="card">
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📷</div>
+                <div class="upload-text">Click to upload or drag & drop</div>
+                <div class="upload-subtext">JPG, PNG up to 10MB</div>
+                <input type="file" id="fileInput" accept="image/jpeg,image/jpg,image/png">
+            </div>
+
+            <div class="detector-choice">
+                <button class="detector-btn active" data-detector="both">Both (Compare)</button>
+                <button class="detector-btn" data-detector="haar">Haar Cascade Only</button>
+                <button class="detector-btn" data-detector="yolo">YOLO Only</button>
+            </div>
+
+            <button class="process-btn" id="processBtn" disabled>
+                🚀 Detect Vehicles
+            </button>
+
+            <div class="error" id="error"></div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Processing image with AI...</p>
+            </div>
+
+            <div class="results" id="results"></div>
+        </div>
+    </div>
+
+    <script>
+        let selectedFile = null;
+        let selectedDetector = 'both';
+
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const processBtn = document.getElementById('processBtn');
+        const loading = document.getElementById('loading');
+        const results = document.getElementById('results');
+        const errorDiv = document.getElementById('error');
+        const detectorBtns = document.querySelectorAll('.detector-btn');
+
+        // File upload handling
+        uploadArea.addEventListener('click', () => fileInput.click());
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                selectedFile = e.target.files[0];
+                uploadArea.querySelector('.upload-text').textContent = `Selected: ${selectedFile.name}`;
+                processBtn.disabled = false;
+            }
+        });
+
+        // Drag and drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            if (e.dataTransfer.files.length > 0) {
+                selectedFile = e.dataTransfer.files[0];
+                fileInput.files = e.dataTransfer.files;
+                uploadArea.querySelector('.upload-text').textContent = `Selected: ${selectedFile.name}`;
+                processBtn.disabled = false;
+            }
+        });
+
+        // Detector selection
+        detectorBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                detectorBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                selectedDetector = btn.dataset.detector;
+            });
+        });
+
+        // Process image
+        processBtn.addEventListener('click', async () => {
+            if (!selectedFile) return;
+
+            errorDiv.style.display = 'none';
+            results.style.display = 'none';
+            loading.style.display = 'block';
+            processBtn.disabled = true;
+
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+            formData.append('detector', selectedDetector);
+
+            try {
+                const response = await fetch('/api/detect', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                displayResults(data);
+
+            } catch (error) {
+                errorDiv.textContent = `Error: ${error.message}`;
+                errorDiv.style.display = 'block';
+            } finally {
+                loading.style.display = 'none';
+                processBtn.disabled = false;
+            }
+        });
+
+        function displayResults(data) {
+            const { results: detectionResults, images } = data;
+
+            let html = '';
+
+            // Comparison image if both detectors
+            if (images.comparison) {
+                html += `
+                    <h2 style="color: #667eea; margin-bottom: 20px;">📊 Side-by-Side Comparison</h2>
+                    <img src="${images.comparison}" class="comparison-image" alt="Comparison">
+                `;
+            }
+
+            html += '<div class="result-grid">';
+
+            // Haar Cascade results
+            if (detectionResults.haar) {
+                const haar = detectionResults.haar;
+                html += `
+                    <div class="result-item">
+                        <h3>🏛️ ${haar.name}</h3>
+                        ${images.haar ? `<img src="${images.haar}" alt="Haar Cascade Detection">` : ''}
+                        <div class="stats">
+                            <div class="stat">
+                                <div class="stat-value">${haar.detections}</div>
+                                <div class="stat-label">Detections</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">${haar.inference_time_ms}</div>
+                                <div class="stat-label">ms</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">${haar.fps}</div>
+                                <div class="stat-label">FPS</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // YOLO results
+            if (detectionResults.yolo && !detectionResults.yolo.error) {
+                const yolo = detectionResults.yolo;
+                html += `
+                    <div class="result-item">
+                        <h3>🚀 ${yolo.name}</h3>
+                        ${images.yolo ? `<img src="${images.yolo}" alt="YOLO Detection">` : ''}
+                        <div class="stats">
+                            <div class="stat">
+                                <div class="stat-value">${yolo.detections}</div>
+                                <div class="stat-label">Detections</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">${yolo.inference_time_ms}</div>
+                                <div class="stat-label">ms</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">${yolo.fps}</div>
+                                <div class="stat-label">FPS</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            html += '</div>';
+
+            results.innerHTML = html;
+            results.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
