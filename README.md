@@ -6,6 +6,9 @@
 
 **Experience the evolution of computer vision** by comparing classical Haar Cascades (2001) with modern YOLOv8 (2023) for vehicle detection.
 
+![Demo Detection](data/results/demo_detection.jpg)
+*Live detection using Haar Cascade - 10 vehicles detected in 16ms*
+
 ## 🌟 What Makes This Special
 
 This isn't just another object detection demo—it's a **time machine** through 22 years of computer vision progress:

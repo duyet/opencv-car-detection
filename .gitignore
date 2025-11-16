@@ -105,6 +105,8 @@ data/uploads/*
 data/results/*.jpg
 data/results/*.png
 !data/results/.gitkeep
+!data/results/demo_*.jpg
+!data/results/demo_*.png
 !data/models/
 !data/samples/
 
