@@ -99,3 +99,36 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# Project-specific
+data/uploads/*
+data/results/*.jpg
+data/results/*.png
+!data/results/.gitkeep
+!data/results/demo_*.jpg
+!data/results/demo_*.png
+!data/models/
+!data/samples/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Pytest
+.pytest_cache/
+*.pytest_cache
+
+# Models (downloaded)
+*.pt
+*.pth
+*.onnx
+
+# Temporary files
+*.tmp
+*.temp
